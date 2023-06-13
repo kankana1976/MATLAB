@@ -1,0 +1,66 @@
+The MATLAB 7.5 Program
+
+The following code is used to randomize the data:
+
+% neural network template script file in matlab environment
+
+%pp=[];       % insert full data in pp including output from excel sheet
+% prepare data matrix in command window as first inputs columns and then outputs
+
+
+[Q,P]=size(p1);
+n=input('Enter the no time to mix :');
+iitr=[3:5:Q 5:5:Q 1:5:Q 4:5:Q 2:5:Q];  % index for training data
+
+                 
+ for i=1:n                       %here we can set no of out put instead of 2
+    pp=p1(iitr,:);
+ end
+For Validation and Testing the randomized data the following code is used:
+
+% neural network template script file in matlab environment
+
+%pp=[];       % insert full data in pp including output from excel sheet
+% prepare data matrix in command window as first inputs columns and then outputs
+noofinputs=input('Enter the no of inputs: ');
+noofoutputs=input('Enter the no of output(s): ');
+
+p=pp(:,1:noofinputs);           % prepare input matrix from pp 
+t=pp(:,(noofinputs+1):(noofinputs+noofoutputs));  % prepare output matrix from pp
+p=p';                           % change row to column of input and out put matrix   
+t=t';        
+
+[pn,minp,maxp,tn,mint,maxt]=premnmx(p,t); % normalizing input and output
+
+[P,Q]=size(pn);
+
+% preparation for mixing training testing and validation data
+% so that it content all types of data in all three sets
+iitr=[1:8:Q 5:8:Q 8:8:Q 3:8:Q];  % index for training data
+iitst=[7:8:Q 4:8:Q];             % index for testing data
+iival=[2:8:Q 6:8:Q];             % index for validation data
+
+ptr=pn(:,iitr);                  % training input and out put   
+ttr=tn(:,iitr);
+
+val.P=pn(:,iival);               % validation struct array     
+val.T=tn(:,iival);
+
+test.P=pn(:,iitst);              % testing struct array 
+test.T=tn(:,iitst);
+
+nodes_1stlayer=input('Enter the no of nodes in first hidden layer: ');
+% here we define network and its parameter
+net=newff(minmax(pn),[nodes_1stlayer noofoutputs],{'tansig','purelin'},'trainscg');
+net.trainParam.epochs=5000;
+net.trainParam.show=500;
+net.trainParam.goal=1e-6;
+[net,tr]=train(net,ptr,ttr,[],[],val,test); % command for training start
+
+% if no of output is more than one
+ an=sim(net,pn);
+ a=postmnmx(an,mint,maxt);
+ for i=1:noofoutputs %here we can set no of out put instead of 2
+    figure(i)
+ [m(i),b(i),r(i)]=postreg(a(i,:),t(i,:));
+ end
